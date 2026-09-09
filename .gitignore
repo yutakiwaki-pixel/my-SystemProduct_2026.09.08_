@@ -1,0 +1,44 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# next.js
+.next/
+out/
+
+# build
+dist/
+build/
+
+# turbo
+.turbo/
+
+# testing
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# prisma
+packages/database/src/generated/
+
+# env
+.env
+.env*.local
+!.env.example
+
+# misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

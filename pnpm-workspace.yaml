@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  '@prisma/engines': true
+  '@swc/core': true
+  prisma: true
+minimumReleaseAgeExclude:
+  - '@types/node@26.5.0'

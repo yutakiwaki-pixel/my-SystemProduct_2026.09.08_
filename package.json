@@ -1,0 +1,29 @@
+{
+  "name": "product-monorepo",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "db:generate": "pnpm --filter @repo/database run generate",
+    "db:migrate": "pnpm --filter @repo/database run migrate",
+    "db:migrate:deploy": "pnpm --filter @repo/database run migrate:deploy"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.12",
+    "turbo": "2.10.12",
+    "typescript": "7.0.2"
+  }
+}
