@@ -16,8 +16,23 @@ description: /feature ループが ready_for_review になったサンドボッ�
    pnpm check && pnpm typecheck && pnpm test && pnpm build && pnpm test:e2e
    ```
    失敗した場合はユーザーに報告し、サンドボックスはまだ削除しない。
-5. 問題なければサンドボックスを削除する:
+5. 通ったら本流へローカルコミットする（監査証跡・ロールバック用。**push はしない** — push は
+   別途ユーザーが明示的に指示した時のみ行う）:
+   - `docs/specs/<slug>.md` の1行目（`# <feature name>`）を件名に使う。
+   - `git add -A` した後、`git status --short` で意図しないファイル（secret・scratch等）が
+     混ざっていないか目視確認してからコミットする:
+     ```bash
+     git commit -m "$(cat <<'EOF'
+     feat(<slug>): <spec の H1 タイトル>
+
+     <このセッションの attribution 指示に従ったトレーラー（あれば）>
+     EOF
+     )"
+     ```
+   - コミットが失敗した場合（pre-commit hook等）はサンドボックスをまだ削除せず、ユーザーに報告する。
+6. コミットできたらサンドボックスを削除する:
    ```bash
    scripts/feature-sandbox.sh discard <slug>
    ```
-6. `docs/specs/<slug>.md` も apply により本流へコピーされているはず。ユーザーに完了を報告する。
+7. `docs/specs/<slug>.md` も apply により本流へコピーされ、5でコミット済みのはず。ユーザーに
+   完了を報告する（コミットハッシュを含める。push はまだ行っていないことも明示する）。

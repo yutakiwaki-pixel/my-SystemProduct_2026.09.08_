@@ -46,5 +46,9 @@ This is the one place unattended multi-attempt work (retrying a rejected spec, r
 implementation, running builds/tests repeatedly) is pre-authorized — it exists specifically so
 the loop doesn't need to ask permission at every retry, because everything it touches is
 confined to the sandbox until you explicitly `apply` it. It does not apply outside of `/feature`
-runs, and it never touches git — this repo has no git history; `apply`/`discard` are the only
-undo mechanism.
+runs.
+
+This repo now has git history. `/feature-apply` commits the applied change locally (one commit
+per applied feature) once final verification passes, so git is the audit trail and rollback
+mechanism for anything already applied; `discard` is still how you drop a sandbox before it's
+ever applied. Pushing to any remote is never automatic — always a separate, explicit request.

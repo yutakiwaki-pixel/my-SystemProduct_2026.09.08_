@@ -141,8 +141,9 @@ Postgres はサービスコンテナとして起動される。CI が落ちた�
 
 ### 6-1. ちょっとした修正・質問
 
-git がないため、普通に会話で依頼すれば直接ファイルを編集して対応する（`pnpm check/typecheck/test/build`
-で検証してから完了報告する運用）。`/feature` を使う必要はない。
+普通に会話で依頼すれば直接ファイルを編集して対応する（`pnpm check/typecheck/test/build`
+で検証してから完了報告する運用）。`/feature` を使う必要はない。コミットするかどうかは
+都度ユーザーの判断（`/feature-apply` のような自動コミットはしない）。
 
 ### 6-2. まとまった機能追加: `/feature <タスクの説明>`
 
@@ -177,8 +178,10 @@ git がないため、普通に会話で依頼すれば直接ファイルを編�
 
 1. `scripts/feature-sandbox.sh diff <slug>` の差分が提示される → 内容を確認して承認する。
 2. 承認すると本流に反映（`rsync` でコピー、ファイル削除は反映されない点に注意）。
-3. 本流で `pnpm check && pnpm typecheck && pnpm test && pnpm build` を再実行して問題なければ
-   サンドボックスを削除する。
+3. 本流で `pnpm check && pnpm typecheck && pnpm test && pnpm build && pnpm test:e2e` を再実行して
+   問題なければ `git add -A && git commit` で1機能=1コミットとして記録する（**push はしない** —
+   push は別途ユーザーが明示的に指示した時のみ）。
+4. コミットが終わったらサンドボックスを削除する。
 
 **注意（本流が後から変わっていた場合）**: サンドボックス作成後に本流側だけで加えた変更
 （インフラ修正など）があると、apply でそれが古い内容に巻き戻る。diff に見覚えのない変更
@@ -230,9 +233,11 @@ Claude Code (VS Code 拡張) を使っている場合、以下を確認する:
 
 ## 7. 既知の制約・未確定事項
 
-- **git 未導入**: このリポジトリに git 履歴はない。`/feature` の取り消しは
-  `scripts/feature-sandbox.sh discard` のみで、apply 後の取り消し手段はない（要 `pnpm check` 等の
-  事前検証と diff レビュー）。将来 git を入れる場合は改めて相談すること。
+- **git 導入済み**: このリポジトリは git 管理下にあり、`origin` は
+  `https://github.com/yutakiwaki-pixel/my-SystemProduct_2026.09.08_.git`（個人アカウント）。
+  `/feature-apply` は最終検証が通った後、本流へ `git commit` するところまで自動で行う
+  （1機能=1コミット、詳細は9番）。リモートへの `push` は自動化しておらず、必要な時に
+  ユーザーが明示的に実行する。
 - **デプロイ先未定**: Vercel か自社 Docker 基盤か未確定。`output: "standalone"` と Dockerfile
   はどちらにも対応できるよう用意済み。
 - **認証プロバイダ未設定**: `apps/web/src/lib/auth.ts` の `providers: []` が空。実際に使う
@@ -260,20 +265,23 @@ Claude Code (VS Code 拡張) を使っている場合、以下を確認する:
 
 ---
 
-## 9. 将来の git 導入手順（今はまだ実行しない）
+## 9. git 導入（実施済み）
 
-現状 git 履歴がないため、`/feature-apply` 後の差分は永続的な記録として残らない
-（`docs/specs/<slug>.md` だけが本流に残る）。「いつでも git を導入できる」ように、実行する時の
-手順だけここに残しておく。**この手順は今回のセッションでは実行していない。**
+2026-09-10 に git を導入した。実施内容:
 
-1. `git init`（ローカルのみ。GitHub に上げるかは別途判断でよい）
-2. `.gitignore` は既に整備済みなので流用できる（`.env`・`node_modules`・生成物などは除外済み）
-3. 初回コミット: `git add -A && git commit -m "chore: initial commit"`
-4. `/feature-apply` の運用を変更する（このタイミングで `.claude/skills/feature-apply/SKILL.md`
-   を修正する）: apply 成功後、`git add -A && git commit -m "feat(<slug>): <summary>"` のように
-   `docs/specs/<slug>.md` へのパスも含めて自動コミットするステップを追加する。これにより
-   `/feature` 1回ごとに1コミットが残り、監査証跡・ロールバック・複数機能の衝突検知が可能になる。
-5. GitHub への push は別問題として、必要になった時点で改めて相談する。
+1. `git init` 済み。`.gitignore` は元々整備されていたものをそのまま流用（`.env`・`node_modules`・
+   生成物などは除外済み）。
+2. 初回コミット（`Initial commit`）済み。
+3. `origin` は `https://github.com/yutakiwaki-pixel/my-SystemProduct_2026.09.08_.git`
+   （個人アカウント）。案件用リポジトリとはアカウントが異なるため、`~/.gitconfig` 側の
+   remote URL ベースの自動切り替え設定で `user.name`/`user.email` の手動切り替えミスを防いでいる
+   （このリポジトリ固有の設定ではなく、マシン側の設定）。
+4. `/feature-apply` の運用を変更済み: apply 成功後、最終検証
+   （`pnpm check/typecheck/test/build/test:e2e`）が通ったら
+   `git add -A && git commit -m "feat(<slug>): <summary>"` を自動実行する
+   （`.claude/skills/feature-apply/SKILL.md` 参照）。これにより `/feature` 1回ごとに1コミットが
+   残り、監査証跡・ロールバック・複数機能の衝突検知が可能になった。
+5. GitHub への `push` は依然として自動化していない。必要になった時点でユーザーが明示的に実行する。
 6. この手順を実行する前に行った `/feature` 適用分は、遡ってコミット履歴を作ることはできない
    （`docs/specs/` に残る仕様書が唯一の記録）。
 
@@ -294,7 +302,7 @@ Claude Code (VS Code 拡張) を使っている場合、以下を確認する:
 - **並列化はしない**: 複数タスクが同じファイルを触る可能性があるため、衝突検知の仕組み
   （= 実質 git）がない限り直列実行が前提。
 - **前提条件**:
-  1. git 導入（上記9番）— 衝突検知・巻き戻り検知に必須。
+  1. ~~git 導入~~ — 完了済み（上記9番）。衝突検知・巻き戻り検知に必須だった前提が満たされた。
   2. 通知経路の確立（今回対応した PushNotification 連携）— 放置運用では特に重要。
   3. `/feature` 単体運用がある程度安定して使えていること（今はまだ実運用回数が少ない）。
-- **着手タイミングの目安**: 9番の git 導入が終わり、`/feature` を単発で何度か問題なく回せた後。
+- **着手タイミングの目安**: `/feature` を単発で何度か問題なく回せた後（git 導入は完了済み）。
