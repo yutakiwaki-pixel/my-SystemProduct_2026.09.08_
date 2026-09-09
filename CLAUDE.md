@@ -48,7 +48,9 @@ the loop doesn't need to ask permission at every retry, because everything it to
 confined to the sandbox until you explicitly `apply` it. It does not apply outside of `/feature`
 runs.
 
-This repo now has git history. `/feature-apply` commits the applied change locally (one commit
-per applied feature) once final verification passes, so git is the audit trail and rollback
-mechanism for anything already applied; `discard` is still how you drop a sandbox before it's
-ever applied. Pushing to any remote is never automatic — always a separate, explicit request.
+This repo now has git history. `/feature-apply` applies onto a dedicated `feature/<slug>` branch
+(never commits directly to `main`) and commits locally there once final verification passes, so
+git is the audit trail and rollback mechanism for anything already applied; `discard` is still
+how you drop a sandbox before it's ever applied. Pushing that branch and opening a PR are never
+automatic — always a separate, explicit request after `/feature-apply` finishes. Merging a PR
+into `main` is a manual step outside this harness.
