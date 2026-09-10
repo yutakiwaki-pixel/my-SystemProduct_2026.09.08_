@@ -243,8 +243,10 @@ Claude Code (VS Code 拡張) を使っている場合、以下を確認する:
   `git commit` するところまで自動で行う（`main` には直接コミットしない。1機能=1コミット、
   詳細は9番）。push・PR作成・`main`へのマージは自動化しておらず、必要な時にユーザーが
   明示的に実行する。
-- **デプロイ先未定**: Vercel か自社 Docker 基盤か未確定。`output: "standalone"` と Dockerfile
-  はどちらにも対応できるよう用意済み。
+- **デプロイ予定なし（雛形のみ維持）**: 現時点でデプロイの計画はない。Vercel でも自社 Docker
+  基盤でも対応できるよう `output: "standalone"`（`DOCKER_BUILD=1` 時のみ、`apps/web/CLAUDE.md`
+  参照）と Dockerfile は雛形として用意済みだが、これ以上の作業（実際のデプロイ設定・CD等）は
+  必要になった時点で改めて着手する。
 - **認証プロバイダ未設定**: `apps/web/src/lib/auth.ts` の `providers: []` が空。実際に使う
   プロバイダ（GitHub 等）を追加する必要がある。
 - **`scripts/feature-sandbox.sh apply` はファイル削除を反映しない**（安全側の設計）。
