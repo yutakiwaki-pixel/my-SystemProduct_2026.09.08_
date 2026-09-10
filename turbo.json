@@ -20,7 +20,7 @@
       "dependsOn": ["^build"]
     },
     "typecheck": {
-      "dependsOn": ["^build", "^generate"]
+      "dependsOn": ["generate", "^build", "^generate"]
     },
     "test": {
       "dependsOn": ["^generate"]
