@@ -24,16 +24,21 @@ FEATURES_DIR="$(dirname "$ROOT")/.claude-feature-sandboxes/$(basename "$ROOT")"
 
 # Excluded from both the sandbox copy and the diff/apply steps: dependency
 # trees plus build/test artifacts that are regenerated, not authored, so they
-# only add noise to the diff.
+# only add noise to the diff. Also apps/*/​.data — runtime state (e.g.
+# apps/vuln-lab's local SQLite file), not source; copying it in either
+# direction silently overwrote the real local dev database with a stale
+# snapshot on every apply (visible as "Binary files ... dev.sqlite3 differ"
+# in the diff), which once corrupted a running dev server's connection into
+# throwing "attempt to write a readonly database".
 EXCLUDES=(
   --exclude node_modules --exclude .next --exclude .turbo --exclude .git --exclude .claude
   --exclude playwright-report --exclude test-results --exclude blob-report --exclude coverage
-  --exclude '*.tsbuildinfo' --exclude generated
+  --exclude '*.tsbuildinfo' --exclude generated --exclude .data
 )
 DIFF_EXCLUDES=(
   -x node_modules -x .next -x .turbo -x .git -x .claude
   -x playwright-report -x test-results -x blob-report -x coverage
-  -x '*.tsbuildinfo' -x generated
+  -x '*.tsbuildinfo' -x generated -x .data
 )
 
 usage() {
