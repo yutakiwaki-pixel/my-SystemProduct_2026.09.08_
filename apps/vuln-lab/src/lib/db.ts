@@ -82,6 +82,18 @@ db.exec(`
     body TEXT NOT NULL,
     created_at TEXT NOT NULL
   );
+
+  -- Tracks consecutive failed login attempts per (scope, email) so the login endpoints can
+  -- lock an identifier out after too many failures — see src/lib/login-rate-limit.ts and
+  -- docs/journal-drafts/004-login-rate-limit.md.
+  CREATE TABLE IF NOT EXISTS login_attempts (
+    scope TEXT NOT NULL,
+    email TEXT NOT NULL,
+    fail_count INTEGER NOT NULL DEFAULT 0,
+    locked_until TEXT,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (scope, email)
+  );
 `);
 
 function seed() {

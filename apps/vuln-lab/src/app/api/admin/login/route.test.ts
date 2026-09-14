@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { hashPassword } from "@/lib/crypto";
+import { db } from "@/lib/db";
 import { POST } from "./route";
 
 function loginRequest(email: string, password: string) {
@@ -23,5 +25,24 @@ describe("POST /api/admin/login", () => {
     expect(response.status).toBe(303);
     expect(response.headers.get("location")).toBe("http://localhost:3100/admin");
     expect(response.headers.get("set-cookie")).toContain("admin_session=");
+  });
+
+  it("locks an admin out after repeated failed attempts, even with the correct password afterwards (rate-limit regression)", async () => {
+    const email = `ratelimit-admin-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
+    const password = "correct-horse-battery-staple";
+    db.prepare("INSERT INTO admins (email, password_hash) VALUES (?, ?)").run(
+      email,
+      hashPassword(password),
+    );
+
+    for (let i = 0; i < 5; i++) {
+      await POST(loginRequest(email, "wrong-password"));
+    }
+
+    const response = await POST(loginRequest(email, password));
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe("http://localhost:3100/admin/login?error=1");
+    expect(response.headers.get("set-cookie")).toBeNull();
   });
 });
