@@ -8,6 +8,11 @@ real issues here, and that is expected. Only change its vulnerabilities if the u
 asks (e.g. a follow-up remediation task), not as a drive-by cleanup while working on something
 else in this repo.
 
+When the user hands you a finding they've already reproduced themselves (payload, endpoint,
+steps), use **`/vuln-remediate <finding>`** rather than fixing it ad hoc — see the root
+`CLAUDE.md`'s "The `/vuln-remediate` loop" section. Discovery itself (attacking the app to find
+the vulnerability) is always the user's job, not yours.
+
 **(b) Never deploy or expose this app.** Local/`localhost` only:
 - No `build` / `start` / `test:e2e` script in `package.json` — it cannot be built, started in
   production mode, or exercised by Playwright through the root scripts.
@@ -45,8 +50,10 @@ with no stated security requirements (see the feature spec this app was built fr
 category + area granularity on purpose — no payloads, endpoint names, or parameter names, so
 there's still something to find.
 
-- **IDOR** — around the reservation detail view in マイページ.
-- **SQL injection** — around the login flows (member and admin).
+- **IDOR** — ~~around the reservation detail view in マイページ~~ found and fixed, see
+  `docs/journal-drafts/001-idor-mypage-reservation-detail.md`.
+- **SQL injection** — ~~around the login flows (member and admin)~~ found and fixed, see
+  `docs/journal-drafts/002-sqli-admin-login.md`.
 - **Stored XSS** — around how posted/submitted text (news, contact messages, reservation
   notes) gets displayed back.
 - **Auth / session handling** — how passwords are stored and how session tokens are issued.

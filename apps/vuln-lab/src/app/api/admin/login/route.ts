@@ -10,10 +10,11 @@ export async function POST(request: Request) {
     const password = String(form.get("password") ?? "");
 
     // Same lookup pattern as the member login (see api/login/route.ts).
-    const query = `SELECT * FROM admins WHERE email = '${email}' AND password_hash = '${hashPassword(
-      password,
-    )}'`;
-    const admin = row<Admin>(db.prepare(query).get());
+    const admin = row<Admin>(
+      db
+        .prepare("SELECT * FROM admins WHERE email = ? AND password_hash = ?")
+        .get(email, hashPassword(password)),
+    );
 
     if (!admin) {
       return NextResponse.redirect(new URL("/admin/login?error=1", request.url), 303);
