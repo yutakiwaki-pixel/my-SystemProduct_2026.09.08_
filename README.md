@@ -25,6 +25,8 @@ Next.js を中心とした、大規模化を見据えたプロダクト雛形で
 ```text
 apps/
   web/            # Next.js アプリ本体
+  vuln-lab/       # 意図的に脆弱性を残した自己ペネトレーションテスト用アプリ・localhost限定・
+                  # build/CI/デプロイ対象外。詳細は apps/vuln-lab/CLAUDE.md
 packages/
   database/       # Prisma スキーマ・クライアント（将来 web 以外のアプリからも共有）
 ```
