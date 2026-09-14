@@ -54,3 +54,15 @@ git is the audit trail and rollback mechanism for anything already applied; `dis
 how you drop a sandbox before it's ever applied. Pushing that branch and opening a PR are never
 automatic — always a separate, explicit request after `/feature-apply` finishes. Merging a PR
 into `main` is a manual step outside this harness.
+
+## The `/vuln-remediate` loop (apps/vuln-lab only)
+
+For one `apps/vuln-lab` finding the user has already found and reproduced themselves, use
+`/vuln-remediate <finding>` instead of implementing the fix ad hoc — same "always route through
+the harness" principle as `/feature`, but a separate, smaller loop (root-cause → journal draft →
+fix → verify → journal completion) scoped to `apps/vuln-lab` alone, so verification doesn't re-run
+the whole monorepo's checks for an isolated, non-deployed package. See
+`.claude/skills/vuln-remediate/SKILL.md`. Discovery itself (attacking the app to find the
+vulnerability) stays the user's job — this loop only starts once they hand you a reproduced
+finding. Applying/discarding the resulting sandbox reuses `/feature-apply` / `/feature-discard`
+unchanged.
