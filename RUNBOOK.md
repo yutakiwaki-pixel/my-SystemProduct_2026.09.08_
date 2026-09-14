@@ -177,13 +177,13 @@ Postgres はサービスコンテナとして起動される。CI が落ちた�
 ### 6-3. 承認して本流に反映: `/feature-apply <slug>`
 
 1. `scripts/feature-sandbox.sh diff <slug>` の差分が提示される → 内容を確認して承認する。
-2. 承認すると `feature/<slug>` ブランチを切ってから本流に反映（`rsync` でコピー、ファイル削除は
+2. 承認すると `feat/<slug>` ブランチを切ってから本流に反映（`rsync` でコピー、ファイル削除は
    反映されない点に注意）。**`main` に直接コミットすることはない。**
 3. `pnpm check && pnpm typecheck && pnpm test && pnpm build && pnpm test:e2e` を再実行して
-   問題なければ `git add -A && git commit` でその `feature/<slug>` ブランチに1機能=1コミットとして
+   問題なければ `git add -A && git commit` でその `feat/<slug>` ブランチに1機能=1コミットとして
    記録する。
 4. コミットが終わったら `main` に戻り、サンドボックスを削除する。
-5. push・PR作成（`git push -u origin feature/<slug>` → `gh pr create`）は自動化していない。
+5. push・PR作成（`git push -u origin feat/<slug>` → `gh pr create`）は自動化していない。
    `/feature-apply` 完了後にユーザーへ都度確認してから実行する。PRを作ればGitHub Actionsの
    CIがそこで走る。`main` へのマージはPR画面から人間が行う。
 
@@ -239,7 +239,7 @@ Claude Code (VS Code 拡張) を使っている場合、以下を確認する:
 
 - **git 導入済み**: このリポジトリは git 管理下にあり、`origin` は
   `https://github.com/yutakiwaki-pixel/my-SystemProduct_2026.09.08_.git`（個人アカウント）。
-  `/feature-apply` は `feature/<slug>` ブランチを切り、最終検証が通った後そのブランチへ
+  `/feature-apply` は `feat/<slug>` ブランチを切り、最終検証が通った後そのブランチへ
   `git commit` するところまで自動で行う（`main` には直接コミットしない。1機能=1コミット、
   詳細は9番）。push・PR作成・`main`へのマージは自動化しておらず、必要な時にユーザーが
   明示的に実行する。
@@ -283,7 +283,7 @@ Claude Code (VS Code 拡張) を使っている場合、以下を確認する:
    （個人アカウント）。案件用リポジトリとはアカウントが異なるため、`~/.gitconfig` 側の
    remote URL ベースの自動切り替え設定で `user.name`/`user.email` の手動切り替えミスを防いでいる
    （このリポジトリ固有の設定ではなく、マシン側の設定）。
-4. `/feature-apply` の運用を変更済み: `main` から `feature/<slug>` ブランチを切り、そこへ apply。
+4. `/feature-apply` の運用を変更済み: `main` から `feat/<slug>` ブランチを切り、そこへ apply。
    最終検証（`pnpm check/typecheck/test/build/test:e2e`）が通ったらそのブランチへ
    `git add -A && git commit -m "feat(<slug>): <summary>"` を自動実行し、`main` に戻る
    （`.claude/skills/feature-apply/SKILL.md` 参照）。`main` への直接コミットはしない。これにより
