@@ -1,5 +1,5 @@
 import { db, type NewsPost, rows } from "@/lib/db";
-import { nl2br } from "@/lib/format";
+import { nl2brSafe } from "@/lib/format";
 
 export default function NewsPage() {
   const posts = rows<NewsPost>(db.prepare("SELECT * FROM news ORDER BY id DESC").all());
@@ -17,8 +17,8 @@ export default function NewsPage() {
             <h2 className="text-lg font-semibold">{post.title}</h2>
             <div
               className="mt-2 text-neutral-700"
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: renders admin-authored line breaks as-is (no output escaping)
-              dangerouslySetInnerHTML={{ __html: nl2br(post.body) }}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: body is HTML-escaped by nl2brSafe first, only <br /> is real markup
+              dangerouslySetInnerHTML={{ __html: nl2brSafe(post.body) }}
             />
           </li>
         ))}
