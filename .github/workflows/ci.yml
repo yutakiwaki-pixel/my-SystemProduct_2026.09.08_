@@ -39,17 +39,27 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # apps/vuln-lab is a local-only, intentionally-vulnerable pentest lab (see
+      # apps/vuln-lab/CLAUDE.md) that must never run in CI. It has no build/start/test:e2e
+      # scripts, so `pnpm build`/`pnpm test:e2e` below already skip it automatically via
+      # Turborepo. `check`/`typecheck`/`test` do cover it locally (see root CLAUDE.md /
+      # Acceptance criteria), so here we exclude it explicitly instead — via each command's
+      # own CLI args, never via biome.json's global ignore list.
       - name: Lint & format check
-        run: pnpm check
+        run: >-
+          pnpm exec biome check
+          apps/web packages scripts docs .github
+          package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json tsconfig.base.json
+          biome.json README.md CLAUDE.md RUNBOOK.md .nvmrc .dockerignore .gitignore
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm exec turbo run typecheck --filter=!vuln-lab
 
       - name: Apply migrations
         run: pnpm db:migrate:deploy
 
       - name: Unit tests
-        run: pnpm test
+        run: pnpm exec turbo run test --filter=!vuln-lab
 
       - name: Build
         run: pnpm build

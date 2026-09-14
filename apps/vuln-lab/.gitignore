@@ -1,0 +1,2 @@
+# local sqlite dev database (created at runtime, see src/lib/db.ts)
+.data/
