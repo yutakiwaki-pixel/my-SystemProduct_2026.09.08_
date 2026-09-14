@@ -15,10 +15,10 @@ export default async function ReservationDetailPage({
 
   const { id } = await params;
 
-  // Loads whichever reservation matches the id in the URL. Logged-in members can view any
-  // reservation this way, not just their own — see apps/vuln-lab/CLAUDE.md.
+  // Scoped to the logged-in member's own id so a reservation belonging to someone else 404s
+  // exactly like a nonexistent one — see docs/journal-drafts/001-idor-mypage-reservation-detail.md.
   const reservation = row<Reservation>(
-    db.prepare("SELECT * FROM reservations WHERE id = ?").get(id),
+    db.prepare("SELECT * FROM reservations WHERE id = ? AND member_id = ?").get(id, member.id),
   );
 
   if (!reservation) {
