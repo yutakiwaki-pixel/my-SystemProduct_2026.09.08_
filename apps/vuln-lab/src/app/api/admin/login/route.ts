@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateToken, hashPassword } from "@/lib/crypto";
+import { generateToken, verifyPassword } from "@/lib/crypto";
 import { type Admin, db, row } from "@/lib/db";
 import { clearFailedAttempts, isLockedOut, recordFailedAttempt } from "@/lib/login-rate-limit";
 import { ADMIN_COOKIE } from "@/lib/session";
@@ -17,13 +17,9 @@ export async function POST(request: Request) {
     }
 
     // Same lookup pattern as the member login (see api/login/route.ts).
-    const admin = row<Admin>(
-      db
-        .prepare("SELECT * FROM admins WHERE email = ? AND password_hash = ?")
-        .get(email, hashPassword(password)),
-    );
+    const admin = row<Admin>(db.prepare("SELECT * FROM admins WHERE email = ?").get(email));
 
-    if (!admin) {
+    if (!admin || !verifyPassword(password, admin.password_hash)) {
       recordFailedAttempt("admin", email);
       return NextResponse.redirect(new URL("/admin/login?error=1", request.url), 303);
     }
