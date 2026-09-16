@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateToken, hashPassword } from "@/lib/crypto";
+import { generateToken, verifyPassword } from "@/lib/crypto";
 import { db, type Member, row } from "@/lib/db";
 import { clearFailedAttempts, isLockedOut, recordFailedAttempt } from "@/lib/login-rate-limit";
 import { MEMBER_COOKIE } from "@/lib/session";
@@ -17,14 +17,12 @@ export async function POST(request: Request) {
       return NextResponse.redirect(new URL("/login?error=1", request.url), 303);
     }
 
-    // Looks up the member by email + password hash directly — see apps/vuln-lab/CLAUDE.md.
-    const member = row<Member>(
-      db
-        .prepare("SELECT * FROM members WHERE email = ? AND password_hash = ?")
-        .get(email, hashPassword(password)),
-    );
+    // Looked up by email alone, then the stored hash is checked with verifyPassword — the
+    // hash is salted (see src/lib/crypto.ts), so it can no longer be matched at the SQL level
+    // the way an unsalted hash could.
+    const member = row<Member>(db.prepare("SELECT * FROM members WHERE email = ?").get(email));
 
-    if (!member) {
+    if (!member || !verifyPassword(password, member.password_hash)) {
       recordFailedAttempt("member", email);
       return NextResponse.redirect(new URL("/login?error=1", request.url), 303);
     }
