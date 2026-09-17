@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { generateToken, verifyPassword } from "@/lib/crypto";
 import { db, type Member, row } from "@/lib/db";
+import { internalErrorResponse } from "@/lib/http-errors";
 import { clearFailedAttempts, isLockedOut, recordFailedAttempt } from "@/lib/login-rate-limit";
 import { MEMBER_COOKIE } from "@/lib/session";
 
@@ -40,6 +41,6 @@ export async function POST(request: Request) {
     response.cookies.set(MEMBER_COOKIE, token, { path: "/" });
     return response;
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return internalErrorResponse(err);
   }
 }

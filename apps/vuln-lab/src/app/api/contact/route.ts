@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { internalErrorResponse } from "@/lib/http-errors";
 
 export async function POST(request: Request) {
   try {
@@ -17,8 +18,6 @@ export async function POST(request: Request) {
 
     return NextResponse.redirect(new URL("/contact?sent=1", request.url), 303);
   } catch (err) {
-    // Surfaces the raw error to the client — handy while building, not so handy in
-    // production. See apps/vuln-lab/CLAUDE.md.
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return internalErrorResponse(err);
   }
 }
