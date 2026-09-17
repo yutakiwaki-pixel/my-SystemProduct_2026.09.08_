@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { internalErrorResponse } from "@/lib/http-errors";
 import { getCurrentMember } from "@/lib/session";
 
 // CSRF protection: getCurrentMember() only proves the member_session cookie is valid, not
@@ -53,6 +54,6 @@ export async function POST(request: Request) {
 
     return NextResponse.redirect(new URL("/mypage", request.url), 303);
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return internalErrorResponse(err);
   }
 }

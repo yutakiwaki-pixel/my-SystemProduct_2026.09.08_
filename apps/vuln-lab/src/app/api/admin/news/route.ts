@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { internalErrorResponse } from "@/lib/http-errors";
 import { getCurrentAdmin } from "@/lib/session";
 
 export async function POST(request: Request) {
@@ -21,6 +22,6 @@ export async function POST(request: Request) {
 
     return NextResponse.redirect(new URL("/admin/news", request.url), 303);
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return internalErrorResponse(err);
   }
 }
