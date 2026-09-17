@@ -4,9 +4,11 @@ export function nl2br(text: string): string {
   return text.replace(/\n/g, "<br />");
 }
 
-// HTML-escapes text before handing it to nl2br, for the one call site (news post display,
-// apps/vuln-lab/src/app/news/page.tsx and src/app/admin/news/page.tsx) that has been remediated
-// per docs/journal-drafts/003-xss-news-post.md. Other nl2br call sites (contacts, reservation
+// HTML-escapes text before handing it to nl2br, for call sites that have been remediated:
+// news post display (apps/vuln-lab/src/app/news/page.tsx and src/app/admin/news/page.tsx,
+// per docs/journal-drafts/003-xss-news-post.md) and admin contact message display
+// (apps/vuln-lab/src/app/admin/contacts/page.tsx, per
+// docs/journal-drafts/009-contact-message-stored-xss.md). Other nl2br call sites (reservation
 // notes) are intentionally left unescaped — see apps/vuln-lab/CLAUDE.md.
 export function nl2brSafe(text: string): string {
   const escaped = text

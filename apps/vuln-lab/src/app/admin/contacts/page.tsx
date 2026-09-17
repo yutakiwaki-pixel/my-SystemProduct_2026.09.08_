@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { type Contact, db, rows } from "@/lib/db";
-import { nl2br } from "@/lib/format";
+import { nl2brSafe } from "@/lib/format";
 import { getCurrentAdmin } from "@/lib/session";
 
 export default async function AdminContactsPage() {
@@ -26,8 +26,8 @@ export default async function AdminContactsPage() {
             </p>
             <div
               className="mt-2 whitespace-pre-line text-neutral-700"
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: renders submitter-authored line breaks as-is (no output escaping)
-              dangerouslySetInnerHTML={{ __html: nl2br(contact.message) }}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: body is HTML-escaped by nl2brSafe first, only <br /> is real markup
+              dangerouslySetInnerHTML={{ __html: nl2brSafe(contact.message) }}
             />
           </li>
         ))}
